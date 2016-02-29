@@ -1,11 +1,17 @@
-//http://forums.codeguru.com/showthread.php?406873-Download-a-file-using-http-amp-winsock
+/*
+Source: http://forums.codeguru.com/showthread.php?406873-Download-a-file-using-http-amp-winsock
+Compilation: 
+    make -s test
+    OR
+    i586-mingw32msvc-g++ -o httpget file_download.c -lws2_32
+*/
 #include <string>
 #include <stdio.h>
 #include <winsock2.h>
 #define BUFFER_LEN (4096)
 using std::string;
-int main(int argc, char **argv)
-{
+const char snsn[]="%s\n";
+int httpget(char * host, char *path, char * filename) {
     HANDLE fhand;
     string request;
     int sendret;
@@ -18,20 +24,15 @@ int main(int argc, char **argv)
     string response;
     const char lb[]="\r\n\r\n";
     const char http[]="http\x3a//";
-    const char snsn[]="%s\n";
     bool error1=false;
     bool error2=false;
     bool error3=false;
-    //int len3=strlen(argv[3]);
+    //int len3=strlen(filename);
     printf(snsn,"\n-=[  httpget v1.0 by Avery Tarasov");
     //printf(snsn,"-=[  Email: c0ldshadow@deeptide.com");
     //printf(snsn,"-=[  Web: www.DeepTide.com");
     //printf(snsn,"-=[  Dedicated to my fiance, Ostine!\n");
-    printf(snsn,"Example usage: httpget theserver.com /somefolder/somefile.zip C:\\savehere.zip");
-    if(argc!=4) {
-        printf(snsn,"\nInvalid usage");
-        goto cleanup;
-    }
+    printf(snsn,"Example usage: httpget theserver.com /somefolder/somefile.zip C:\\savehere.zip");    
     WSADATA wsaData; //(structure to hold "winsocket implementation info") https://msdn.microsoft.com/en-us/library/windows/desktop/ms741563(v=vs.85).aspx
     if(WSAStartup(MAKEWORD(2,2),&wsaData)!=0) {//The WSAStartup function initiates use of the Winsock DLL by a process.
         printf(snsn,"\nError initializing Winsock 2.2");
@@ -47,14 +48,14 @@ int main(int argc, char **argv)
     struct hostent *h;
     struct sockaddr_in sa;
     SOCKET server1;
-    h=gethostbyname(argv[1]);
+    h=gethostbyname(host);
     if(h==0)
     {
         printf(snsn,"\ngethostbyname() failed");
         goto cleanup;
     }
     printf("%s","\nHost lookup succeeded for ");
-    printf(snsn,argv[1]);
+    printf(snsn, host);
     memcpy((char *)&sa.sin_addr,(char *)h->h_addr,sizeof(sa.sin_addr));
     sa.sin_family=h->h_addrtype;
     sa.sin_port=htons(80);
@@ -72,14 +73,14 @@ int main(int argc, char **argv)
         goto cleanup;
     }
     printf("%s","\nNow connected to ");
-    printf("%s",argv[1]);
+    printf("%s",host);
     printf(snsn," via port 80");
     request+="GET ";
-    request+=argv[2];
+    request+=path;
     request+=" HTTP/1.0";
     request+=&lb[2];
     request+="Host: ";
-    request+=argv[1];
+    request+=host;
     request+=lb;
     printf(snsn,"\nHTTP request constructed successfully:\n");
     printf(snsn,request.c_str());
@@ -91,7 +92,7 @@ int main(int argc, char **argv)
     }
     printf(snsn,"Successfully sent HTTP request to the server");
     printf(snsn,"\nWaiting for download to complete");
-	fhand=CreateFile(argv[3],GENERIC_WRITE,FILE_SHARE_READ,0,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,0);
+	fhand=CreateFile(filename,GENERIC_WRITE,FILE_SHARE_READ,0,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,0);
 	if(fhand==INVALID_HANDLE_VALUE)
 	{
         printf(snsn,"\nCreateFile() failed");
@@ -143,7 +144,7 @@ int main(int argc, char **argv)
         else
         {
             printf("%s","\nFile successfully downloaded and saved to ");
-            printf(snsn,argv[3]);
+            printf(snsn,filename);
         }
     }
     cleanup:
@@ -153,5 +154,15 @@ int main(int argc, char **argv)
         closesocket(server1);
     if(error3)
         CloseHandle(fhand);
+    if(error1 || error2 || error3)
+        return 1;
     return 0;
+}
+
+int main(int argc, char * argv[]) {
+    if(argc!=4) {
+        printf(snsn,"\nInvalid usage");        
+        return 1;
+    }
+    return httpget(argv[1],argv[2],argv[3]);
 }
