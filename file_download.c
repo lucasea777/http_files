@@ -22,20 +22,18 @@ int main(int argc, char **argv)
     bool error1=false;
     bool error2=false;
     bool error3=false;
-    int len3=strlen(argv[3]);
+    //int len3=strlen(argv[3]);
     printf(snsn,"\n-=[  httpget v1.0 by Avery Tarasov");
-    printf(snsn,"-=[  Email: c0ldshadow@deeptide.com");
-    printf(snsn,"-=[  Web: www.DeepTide.com");
-    printf(snsn,"-=[  Dedicated to my fiance, Ostine!\n");
+    //printf(snsn,"-=[  Email: c0ldshadow@deeptide.com");
+    //printf(snsn,"-=[  Web: www.DeepTide.com");
+    //printf(snsn,"-=[  Dedicated to my fiance, Ostine!\n");
     printf(snsn,"Example usage: httpget theserver.com /somefolder/somefile.zip C:\\savehere.zip");
-    if(argc!=4)
-    {
+    if(argc!=4) {
         printf(snsn,"\nInvalid usage");
         goto cleanup;
     }
-    WSADATA wsaData;
-    if(WSAStartup(MAKEWORD(2,2),&wsaData)!=0)
-    {
+    WSADATA wsaData; //(structure to hold "winsocket implementation info") https://msdn.microsoft.com/en-us/library/windows/desktop/ms741563(v=vs.85).aspx
+    if(WSAStartup(MAKEWORD(2,2),&wsaData)!=0) {//The WSAStartup function initiates use of the Winsock DLL by a process.
         printf(snsn,"\nError initializing Winsock 2.2");
         goto cleanup;
     }
@@ -149,20 +147,11 @@ int main(int argc, char **argv)
         }
     }
     cleanup:
-    if(error1)
-    {
+    if(error1 || error2 || error3)
         WSACleanup();
-    }
-    if(error2)
-    {
-        WSACleanup();
+    if(error2 || error3)
         closesocket(server1);
-    }
     if(error3)
-    {
-        WSACleanup();
-        closesocket(server1);
         CloseHandle(fhand);
-    }
     return 0;
 }
