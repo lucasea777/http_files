@@ -1,4 +1,5 @@
 //http://forums.codeguru.com/showthread.php?406873-Download-a-file-using-http-amp-winsock
+//as simple as possible
 #include <string>
 #include <stdio.h>
 #include <winsock2.h>
