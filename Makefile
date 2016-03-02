@@ -4,4 +4,6 @@ all:
 	$(CC) -o httpget file_download.c -lws2_32
 test:
 	bash test.sh
+clean:
+	rm -f httpget horse.mp3
         

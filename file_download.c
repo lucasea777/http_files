@@ -11,6 +11,7 @@ Compilation:
 #define BUFFER_LEN (4096)
 using std::string;
 const char snsn[]="%s\n";
+
 int httpget(char * host, char *path, char * filename) {
     HANDLE fhand;
     string request;
@@ -100,6 +101,7 @@ int httpget(char * host, char *path, char * filename) {
 	}
     error2=false;
     error3=true;
+    //int counter; //must be long??!
     while((iRecv=recv(server1,recvBuffer,BUFFER_LEN-1,0))>0)
     {
         /*
@@ -117,6 +119,7 @@ int httpget(char * host, char *path, char * filename) {
             printf("%s ",hex);
         }
         */
+        //printf("count: %d\n", counter++);
         response.append(recvBuffer,iRecv);
         iResponseLength+=iRecv;
         ZeroMemory(recvBuffer,BUFFER_LEN);
@@ -160,9 +163,21 @@ int httpget(char * host, char *path, char * filename) {
 }
 
 int main(int argc, char * argv[]) {
-    if(argc!=4) {
+    if(argc!=4 && argc != 2) {
         printf(snsn,"\nInvalid usage");        
         return 1;
+    }
+    printf("%s %d",argv[1], argc);    
+    char test[5] = "test";
+    if (argc == 2 && strncmp(argv[1],test,5) == 0) {
+        //char host[20] = "www.w3schools.com";
+        char host[40] = "www.lukspage.hostzi.com";
+        //char path[20] = "/html/horse.mp3";
+        char path[40] = "/notasssss/index.php";
+        //char filename[40] = "horse.mp3";
+        char filename[40] = "index.php";
+
+        return httpget(host, path, filename);
     }
     return httpget(argv[1],argv[2],argv[3]);
 }
